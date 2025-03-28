@@ -11,6 +11,10 @@ export default function Index() {
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
         />
+        <link
+          rel="stylesheet"
+          href="https://esm.sh/jointjs@3.7.7/dist/joint.css"
+        />
       </Head>
       <Home />
     </>

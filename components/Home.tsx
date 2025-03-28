@@ -1,8 +1,9 @@
 import NameCycle from "../islands/NameCycle.tsx";
-import CFGNav from "../islands/CFGNav.tsx";
+// import CFGNavWrapper from "../islands/CFGNavWrapper.tsx";
+import JointJSComponent from "../islands/JointJSComponent.tsx";
 
 export default function Home() {
- return (
+  return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen bg-base px-4 py-12">
       {/* Logo */}
       <div className="mb-8 w-48 h-48 rounded-full overflow-hidden">
@@ -22,12 +23,12 @@ export default function Home() {
 
       {/* Subtitle */}
       <p className="text-lg sm:text-xl text-muted text-center mt-4">
-        Reverse engineering, CTFs, binaries, and breaking stuff.
+        I like reverse engineering. Sometimes.
       </p>
 
-      {/* CFG Graph */}
-      <div className="mt-12 w-full max-w-5xl">
-        <CFGNav />
+      {/* JointJS Diagram */}
+      <div className="mt-12 w-full max-w-6xl">
+        <JointJSComponent />
       </div>
     </div>
   );

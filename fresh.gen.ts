@@ -7,10 +7,11 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_joke from "./routes/api/joke.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
-import * as $CFGNav from "./islands/CFGNav.tsx";
+import * as $CFGNavWrapper from "./islands/CFGNavWrapper.tsx";
 import * as $Counter from "./islands/Counter.tsx";
 import * as $DisassemblyEffect from "./islands/DisassemblyEffect.tsx";
 import * as $HexDecoder from "./islands/HexDecoder.tsx";
+import * as $JointJSComponent from "./islands/JointJSComponent.tsx";
 import * as $NameCycle from "./islands/NameCycle.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -23,10 +24,11 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
-    "./islands/CFGNav.tsx": $CFGNav,
+    "./islands/CFGNavWrapper.tsx": $CFGNavWrapper,
     "./islands/Counter.tsx": $Counter,
     "./islands/DisassemblyEffect.tsx": $DisassemblyEffect,
     "./islands/HexDecoder.tsx": $HexDecoder,
+    "./islands/JointJSComponent.tsx": $JointJSComponent,
     "./islands/NameCycle.tsx": $NameCycle,
   },
   baseUrl: import.meta.url,
