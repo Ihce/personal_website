@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import * as joint from 'https://esm.sh/jointjs@3.7.7';
 
 const colors = {
@@ -12,7 +12,7 @@ const colors = {
   pine: "#3e8fb0",
 };
 
-// 🧱 Define a custom shape with body, header, headerLabel, and bodyLabel
+// Define a custom shape with cursor pointer on all parts
 const HeaderedBlock = joint.dia.Element.define('custom.HeaderedBlock', {
   attrs: {
     body: {
@@ -23,15 +23,17 @@ const HeaderedBlock = joint.dia.Element.define('custom.HeaderedBlock', {
       strokeWidth: 2,
       rx: 6,
       ry: 6,
+      cursor: 'pointer',
     },
     header: {
       refWidth: '100%',
       height: 24,
       fill: colors.overlay,
-      stroke: colors.overlay,  // Default stroke color
-      strokeWidth: 2, // Stroke width for the header
+      stroke: colors.overlay,
+      strokeWidth: 2,
       rx: 6,
       ry: 6,
+      cursor: 'pointer',
     },
     headerLabel: {
       refX: '50%',
@@ -41,15 +43,17 @@ const HeaderedBlock = joint.dia.Element.define('custom.HeaderedBlock', {
       fontSize: 10,
       fontFamily: 'JetBrains Mono, monospace',
       fill: colors.text,
+      cursor: 'pointer',
     },
     bodyLabel: {
       refX: '50%',
       refY: 50,
       textAnchor: 'middle',
       textVerticalAnchor: 'middle',
-      fontSize: 11,  // Slightly larger bottom text
+      fontSize: 11,
       fontFamily: 'JetBrains Mono, monospace',
       fill: colors.text,
+      cursor: 'pointer',
     },
   },
   markup: [
@@ -63,14 +67,14 @@ const HeaderedBlock = joint.dia.Element.define('custom.HeaderedBlock', {
 export default function JointJSComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const currentPath = globalThis.location?.pathname ?? '/';
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const margin = 10;
-    const scaleFactor = 1.15; // Scale the entire graph by 15%
-    const paperWidth = (containerRef.current.clientWidth || 800) * scaleFactor;
-    const paperHeight = 500 * scaleFactor;
+    const scaleFactor = 1.15;
+    const paperWidth = containerRef.current.clientWidth || 800;
+    const paperHeight = 500;
 
     const graph = new joint.dia.Graph();
 
@@ -112,18 +116,17 @@ export default function JointJSComponent() {
       const isActive =
         currentPath === `/${id}` ||
         (id === 'home' && (currentPath === '/' || currentPath === ''));
-
       const block = new HeaderedBlock({
         id,
-        position: { x: x * scaleFactor, y: y * scaleFactor },  // Scale position
-        size: { width: 160 * scaleFactor, height: 80 * scaleFactor }, // Scale size
+        position: { x, y },
+        size: { width: 160, height: 80 },
         attrs: {
           body: {
             stroke: isActive ? colors.accent : colors.overlay,
           },
           header: {
             fill: colors.overlay,
-            stroke: isActive ? colors.accent : colors.overlay, // Added stroke for header
+            stroke: isActive ? colors.accent : colors.overlay,
             strokeWidth: 2,
           },
           headerLabel: {
@@ -133,64 +136,18 @@ export default function JointJSComponent() {
           bodyLabel: {
             text: bodyAsm,
             fill: colors.text,
-            fontSize: 11, // Slightly larger bottom text
+            fontSize: 11,
           },
         },
       });
-
       block.addTo(graph);
-
-      paper.once('render:done', () => {
-        const blockView = paper.findViewByModel(block);
-        if (!blockView) return;
-
-        blockView.el.style.cursor = 'pointer';
-
-        blockView.on('element:pointerclick', () => {
-          globalThis.location.href = `/${id}`;
-        });
-
-        blockView.on('mouseenter', () => {
-          block.attr('body/filter', {
-            name: 'dropShadow',
-            args: {
-              dx: 0,
-              dy: 0,
-              blur: 12,
-              color: colors.iris,
-            },
-          });
-        });
-
-        blockView.on('mouseleave', () => {
-          block.removeAttr('body/filter');
-        });
-      });
-
-      block.transition('attrs/body/opacity', {
-        value: 1,
-        duration: 300,
-      });
-      block.transition('attrs/headerLabel/opacity', {
-        value: 1,
-        duration: 300,
-        delay: 100,
-      });
-      block.transition('attrs/bodyLabel/opacity', {
-        value: 1,
-        duration: 300,
-        delay: 150,
-      });
     };
 
     const connect = (from: string, to: string) => {
       const link = new joint.shapes.standard.Link();
-
       link.source({ id: from });
       link.target({ id: to });
-
       link.router('orthogonal');
-
       link.attr({
         line: {
           stroke: colors.accent,
@@ -203,42 +160,83 @@ export default function JointJSComponent() {
           },
         },
       });
-
       link.set('interactive', false);
       link.removeAttr(['tools']);
-
       graph.addCell(link);
     };
 
     try {
+      // Create blocks
       makeBlock("home", 320, 40, "Home", "lea eax, nav\ncall [home]");
       makeBlock("about", 120, 200, "About", "mov eax, about*me\njmp /about");
       makeBlock("writeups", 320, 200, "Writeups", "cmp eax, blog*posts\njne /blog");
       makeBlock("projects", 520, 200, "Projects", "mov eax, todo\njmp /future");
 
+      // Connect blocks
       connect("home", "about");
       connect("home", "writeups");
       connect("home", "projects");
 
-      const maybeBBox = graph.getBBox();
-      if (maybeBBox) {
-        const paperSize = paper.getComputedSize();
-        const offsetX = (paperSize.width - maybeBBox.width) / 2 - maybeBBox.x;
-        const offsetY = (paperSize.height - maybeBBox.height) / 2 - maybeBBox.y;
+      // Scale the graph
+      paper.scale(scaleFactor, scaleFactor);
 
-        // ✅ Re-center the graph after scaling
+      // Style the paper container
+      const paperElement = paper.el as HTMLDivElement;
+      paperElement.style.border = '5px solid #eb6f92';
+      paperElement.style.borderRadius = '10px';
+
+      // Center the content accounting for scaling
+      const maybeBBox = graph.getBBox();
+      const paperSize = paper.getComputedSize();
+
+      if (maybeBBox) {
+        const scaledBBox = {
+          x: maybeBBox.x * scaleFactor,
+          y: maybeBBox.y * scaleFactor,
+          width: maybeBBox.width * scaleFactor,
+          height: maybeBBox.height * scaleFactor,
+        };
+        const offsetX = (paperSize.width - scaledBBox.width) / 2 - scaledBBox.x;
+        const offsetY = (paperSize.height - scaledBBox.height) / 2 - scaledBBox.y;
         paper.setOrigin(offsetX, offsetY);
       }
     } catch (error) {
       console.error("Error creating graph:", error);
+    } finally {
+      // Mark graph as loaded so that the spinner is hidden
+      setLoading(false);
     }
+
+    // Add click event to navigate when a node is clicked
+    paper.on('cell:pointerclick', (cellView, evt) => {
+      const cell = cellView.model;
+      if (cell.isElement()) {
+        const id = cell.id;
+        window.location.href = id === 'home' ? '/' : `/${id}`;
+      }
+    });
   }, [currentPath]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full joint-paper joint-theme-default"
-      style={{ height: "500px" }}
-    />
+    <div className="relative" style={{ height: "500px", width: "100%" }}>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-base z-50">
+          <div
+            className="animate-spin rounded-full"
+            style={{
+              width: "4rem",
+              height: "4rem",
+              border: "4px solid #393552",
+              borderTopColor: "#eb6f92",
+            }}
+          />
+        </div>
+      )}
+      <div
+        ref={containerRef}
+        className="w-full joint-paper joint-theme-default"
+        style={{ height: "500px" }}
+      />
+    </div>
   );
 }

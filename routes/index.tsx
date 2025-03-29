@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import Home from "../components/Home.tsx";
+import Home from "./Home.tsx";
 
 export default function Index() {
   return (
