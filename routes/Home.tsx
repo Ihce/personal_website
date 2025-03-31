@@ -4,9 +4,9 @@ import JointJSComponent from "../islands/JointJSComponent.tsx";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-base px-4 py-12">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-base px-4 py-12 space-y-6 sm:space-y-12">
       {/* Logo */}
-      <div className="mb-8 w-48 h-48 rounded-full overflow-hidden">
+      <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full overflow-hidden">
         <img 
           src="/logo.png" 
           alt="Logo" 
@@ -16,18 +16,29 @@ export default function Home() {
 
       {/* Name Cycle */}
       <div className="w-full text-center overflow-hidden whitespace-nowrap">
-        <h1 className="text-5xl sm:text-6xl font-bold text-accent">
+        <h1 className="text-4xl sm:text-6xl font-bold text-accent">
           <NameCycle />
         </h1>
       </div>
 
       {/* Subtitle */}
-      <p className="text-lg sm:text-xl text-muted text-center mt-4">
+      <p className="text-lg sm:text-xl text-muted text-center">
         I like reverse engineering. Sometimes.
       </p>
 
-      {/* JointJS Diagram */}
-      <div className="mt-12 w-full max-w-6xl">
+      {/* Mobile-Only Cards */}
+      <a href="/about" className="block sm:hidden w-full max-w-md bg-surface shadow-lg rounded-2xl px-6 py-4 text-center font-medium hover:bg-accent/20 transition">
+        About
+      </a>
+      <a href="/writeups" className="block sm:hidden w-full max-w-md bg-surface shadow-lg rounded-2xl px-6 py-4 text-center font-medium hover:bg-accent/20 transition">
+        Writeups
+      </a>
+      <a href="/projects" className="block sm:hidden w-full max-w-md bg-surface shadow-lg rounded-2xl px-6 py-4 text-center font-medium hover:bg-accent/20 transition">
+        Projects
+      </a>
+
+      {/* Desktop Diagram */}
+      <div className="hidden sm:block w-full max-w-6xl">
         <JointJSComponent />
       </div>
     </div>
