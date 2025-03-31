@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
-import * as joint from 'https://esm.sh/jointjs@3.7.7';
+import { useEffect, useRef, useState } from "preact/hooks";
+import * as joint from "https://esm.sh/jointjs@3.7.7";
 
 const colors = {
   base: "#232136",
@@ -12,68 +12,37 @@ const colors = {
   pine: "#3e8fb0",
 };
 
-// Define a custom shape with cursor pointer on all parts
-const HeaderedBlock = joint.dia.Element.define('custom.HeaderedBlock', {
-  attrs: {
-    body: {
-      refWidth: '100%',
-      refHeight: '100%',
-      fill: colors.surface,
-      stroke: colors.overlay,
-      strokeWidth: 2,
-      rx: 6,
-      ry: 6,
-      cursor: 'pointer',
-    },
-    header: {
-      refWidth: '100%',
-      height: 24,
-      fill: colors.overlay,
-      stroke: colors.overlay,
-      strokeWidth: 2,
-      rx: 6,
-      ry: 6,
-      cursor: 'pointer',
-    },
-    headerLabel: {
-      refX: '50%',
-      refY: 12,
-      textAnchor: 'middle',
-      textVerticalAnchor: 'middle',
-      fontSize: 10,
-      fontFamily: 'JetBrains Mono, monospace',
-      fill: colors.text,
-      cursor: 'pointer',
-    },
-    bodyLabel: {
-      refX: '50%',
-      refY: 50,
-      textAnchor: 'middle',
-      textVerticalAnchor: 'middle',
-      fontSize: 11,
-      fontFamily: 'JetBrains Mono, monospace',
-      fill: colors.text,
-      cursor: 'pointer',
-    },
-  },
-  markup: [
-    { tagName: 'rect', selector: 'body' },
-    { tagName: 'rect', selector: 'header' },
-    { tagName: 'text', selector: 'headerLabel' },
-    { tagName: 'text', selector: 'bodyLabel' },
-  ],
+// Completely revised the tspan approach
+const createBlockMarkup = (lineCount: number): any[] => {
+  // Create an array of text elements instead of tspans
+  const textElements = Array.from({ length: lineCount }, (_, i) => ({
+    tagName: "text",
+    selector: `line${i + 1}`,
+  }));
+
+  return [
+    { tagName: "rect", selector: "body" },
+    { tagName: "rect", selector: "header" },
+    { tagName: "text", selector: "headerLabel" },
+    ...textElements
+  ];
+};
+
+const HeaderedBlock = joint.dia.Element.define("custom.HeaderedBlock", {
+  attrs: {},
+  markup: [],
 });
 
 export default function JointJSComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const currentPath = globalThis.location?.pathname ?? '/';
+  const currentPath = globalThis.location?.pathname ?? "/";
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const scaleFactor = 1.15;
-    const paperWidth = containerRef.current.clientWidth || 800;
+    const paperWidth = containerRef.current!.clientWidth || 800;
     const paperHeight = 500;
 
     const graph = new joint.dia.Graph();
@@ -86,8 +55,8 @@ export default function JointJSComponent() {
       gridSize: 10,
       background: { color: "transparent" },
       linkPinning: false,
-      defaultConnectionPoint: { name: 'boundary' },
-      interactive: (cellView) => {
+      defaultConnectionPoint: { name: "boundary" },
+      interactive: (cellView: joint.dia.CellView) => {
         if (cellView.model.isElement()) {
           return {
             elementMove: false,
@@ -111,35 +80,82 @@ export default function JointJSComponent() {
       x: number,
       y: number,
       headerText: string,
-      bodyAsm: string
+      bodyAsm: string,
     ) => {
-      const isActive =
-        currentPath === `/${id}` ||
-        (id === 'home' && (currentPath === '/' || currentPath === ''));
+      const isActive = currentPath === `/${id}` || (id === "home" && (currentPath === "/" || currentPath === ""));
+      const lines = bodyAsm.split("\n").filter(Boolean);
+      
+      // Calculate the block height based on the number of lines
+      const lineHeight = 18; // Height per line of text
+      const headerHeight = 24;
+      const paddingTop = 10; // Space after header before text starts
+      const paddingBottom = 12; // Space after last line
+      const totalHeight = headerHeight + paddingTop + (lines.length * lineHeight) + paddingBottom;
+
+      const highlightedLines = lines.map((line: string) => {
+        if (line.includes("'writeups'")) return { text: line, fill: colors.iris };
+        if (line.includes("'about'")) return { text: line, fill: colors.pine };
+        if (line.includes("'projects'")) return { text: line, fill: colors.accent };
+        return { text: line, fill: colors.text };
+      });
+
+      // Create attributes for each line
+      const lineAttrs: Record<string, any> = {};
+      highlightedLines.forEach((line, i) => {
+        lineAttrs[`line${i + 1}`] = {
+          text: line.text,
+          fill: line.fill,
+          textAnchor: "start",
+          textVerticalAnchor: "middle",
+          fontSize: 11,
+          fontFamily: "JetBrains Mono, monospace",
+          x: 12,
+          y: headerHeight + paddingTop + (i * lineHeight),
+          cursor: "pointer",
+        };
+      });
+
       const block = new HeaderedBlock({
         id,
         position: { x, y },
-        size: { width: 160, height: 80 },
+        size: { width: 220, height: totalHeight },
+        markup: createBlockMarkup(lines.length),
         attrs: {
           body: {
+            refWidth: "100%",
+            refHeight: "100%",
+            fill: colors.surface,
             stroke: isActive ? colors.accent : colors.overlay,
+            strokeWidth: 2,
+            rx: 6,
+            ry: 6,
+            cursor: "pointer",
           },
           header: {
+            refWidth: "100%",
+            height: headerHeight,
             fill: colors.overlay,
             stroke: isActive ? colors.accent : colors.overlay,
             strokeWidth: 2,
+            rx: 6,
+            ry: 6,
+            cursor: "pointer",
           },
           headerLabel: {
-            text: headerText,
+            refX: 12,
+            refY: headerHeight / 2,
+            textAnchor: "start",
+            textVerticalAnchor: "middle",
+            fontSize: 10,
+            fontFamily: "JetBrains Mono, monospace",
             fill: isActive ? colors.accent : colors.text,
+            cursor: "pointer",
+            text: headerText,
           },
-          bodyLabel: {
-            text: bodyAsm,
-            fill: colors.text,
-            fontSize: 11,
-          },
+          ...lineAttrs
         },
       });
+
       block.addTo(graph);
     };
 
@@ -147,45 +163,73 @@ export default function JointJSComponent() {
       const link = new joint.shapes.standard.Link();
       link.source({ id: from });
       link.target({ id: to });
-      link.router('orthogonal');
+      link.router("orthogonal");
       link.attr({
         line: {
           stroke: colors.accent,
           strokeWidth: 2,
-          pointerEvents: 'none',
+          pointerEvents: "none",
           targetMarker: {
-            type: 'path',
-            d: 'M 10 -5 0 0 10 5 z',
+            type: "path",
+            d: "M 10 -5 0 0 10 5 z",
             fill: colors.accent,
           },
         },
       });
-      link.set('interactive', false);
-      link.removeAttr(['tools']);
+      link.set("interactive", false);
+      link.removeAttr(["tools"]);
       graph.addCell(link);
     };
 
     try {
-      // Create blocks
-      makeBlock("home", 320, 40, "Home", "lea eax, nav\ncall [home]");
-      makeBlock("about", 120, 200, "About", "mov eax, about*me\njmp /about");
-      makeBlock("writeups", 320, 200, "Writeups", "cmp eax, blog*posts\njne /blog");
-      makeBlock("projects", 520, 200, "Projects", "mov eax, todo\njmp /future");
+      // Increased spacing between boxes both horizontally and vertically
+      
+      // Home box positioned higher up
+      makeBlock(
+        "home",
+        320,
+        20,  // Moved up from 40
+        "0x08048000 (Home)",
+        "xor eax, eax\nmov al, [current_selection]\ncmp al, 3\njae default_page\njmp [jump_table + eax*4]"
+      );
 
-      // Connect blocks
+      // Increased vertical spacing from home to second row (from 200 to 240)
+      // Increased horizontal spacing between boxes (wider spread)
+      makeBlock(
+        "about",
+        80,   // Further left from 120
+        240,  // Further down from 200
+        "0x08048100 (About)",
+        "push ebp\nmov ebp, esp\npush 'about'\ncall render_page\nadd esp, 4\nret"
+      );
+
+      makeBlock(
+        "writeups",
+        320,  // Center position maintained
+        240,  // Further down from 200
+        "0x08048200 (Writeups)",
+        "push ebp\nmov ebp, esp\npush 'writeups'\ncall render_page\nadd esp, 4\nret"
+      );
+
+      makeBlock(
+        "projects",
+        560,  // Further right from 520
+        240,  // Further down from 200
+        "0x08048300 (Projects)",
+        "push ebp\nmov ebp, esp\npush 'projects'\ncall render_page\nadd esp, 4\nret"
+      );
+
       connect("home", "about");
       connect("home", "writeups");
       connect("home", "projects");
 
-      // Scale the graph
       paper.scale(scaleFactor, scaleFactor);
 
-      // Style the paper container
       const paperElement = paper.el as HTMLDivElement;
-      paperElement.style.border = '5px solid #eb6f92';
-      paperElement.style.borderRadius = '10px';
+      paperElement.style.border = "5px solid #eb6f92";
+      paperElement.style.borderRadius = "10px";
 
-      // Center the content accounting for scaling
+      // Center the graph content
       const maybeBBox = graph.getBBox();
       const paperSize = paper.getComputedSize();
 
@@ -203,16 +247,14 @@ export default function JointJSComponent() {
     } catch (error) {
       console.error("Error creating graph:", error);
     } finally {
-      // Mark graph as loaded so that the spinner is hidden
       setLoading(false);
     }
 
-    // Add click event to navigate when a node is clicked
-    paper.on('cell:pointerclick', (cellView, evt) => {
+    paper.on("cell:pointerclick", (cellView) => {
       const cell = cellView.model;
       if (cell.isElement()) {
         const id = cell.id;
-        window.location.href = id === 'home' ? '/' : `/${id}`;
+        globalThis.location.href = id === "home" ? "/" : `/${id}`;
       }
     });
   }, [currentPath]);

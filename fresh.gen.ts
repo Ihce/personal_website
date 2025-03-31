@@ -10,13 +10,11 @@ import * as $api_joke from "./routes/api/joke.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $projects from "./routes/projects.tsx";
-import * as $writeups from "./routes/writeups.tsx";
-import * as $CFGNavWrapper from "./islands/CFGNavWrapper.tsx";
-import * as $Counter from "./islands/Counter.tsx";
-import * as $DisassemblyEffect from "./islands/DisassemblyEffect.tsx";
-import * as $HexDecoder from "./islands/HexDecoder.tsx";
+import * as $writeups_ctf_slug_ from "./routes/writeups/[ctf]/[slug].tsx";
+import * as $writeups_index from "./routes/writeups/index.tsx";
 import * as $JointJSComponent from "./islands/JointJSComponent.tsx";
 import * as $NameCycle from "./islands/NameCycle.tsx";
+import * as $WriteupPage from "./islands/WriteupPage.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -29,15 +27,13 @@ const manifest = {
     "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
     "./routes/projects.tsx": $projects,
-    "./routes/writeups.tsx": $writeups,
+    "./routes/writeups/[ctf]/[slug].tsx": $writeups_ctf_slug_,
+    "./routes/writeups/index.tsx": $writeups_index,
   },
   islands: {
-    "./islands/CFGNavWrapper.tsx": $CFGNavWrapper,
-    "./islands/Counter.tsx": $Counter,
-    "./islands/DisassemblyEffect.tsx": $DisassemblyEffect,
-    "./islands/HexDecoder.tsx": $HexDecoder,
     "./islands/JointJSComponent.tsx": $JointJSComponent,
     "./islands/NameCycle.tsx": $NameCycle,
+    "./islands/WriteupPage.tsx": $WriteupPage,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

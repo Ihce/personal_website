@@ -15,6 +15,11 @@ export default function Index() {
           rel="stylesheet"
           href="https://esm.sh/jointjs@3.7.7/dist/joint.css"
         />
+        <style>{`
+          html, body {
+            background-color: #232136;
+          }
+        `}</style>
       </Head>
       <Home />
     </>
