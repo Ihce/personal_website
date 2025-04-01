@@ -226,8 +226,8 @@ export default function JointJSComponent() {
       paper.scale(scaleFactor, scaleFactor);
 
       const paperElement = paper.el as HTMLDivElement;
-      paperElement.style.border = "5px solid #eb6f92";
-      paperElement.style.borderRadius = "10px";
+      // paperElement.style.border = "5px solid #eb6f92";
+      // paperElement.style.borderRadius = "10px";
 
       // Center the graph content
       const maybeBBox = graph.getBBox();

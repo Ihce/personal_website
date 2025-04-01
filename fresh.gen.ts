@@ -12,6 +12,7 @@ import * as $index from "./routes/index.tsx";
 import * as $projects from "./routes/projects.tsx";
 import * as $writeups_ctf_slug_ from "./routes/writeups/[ctf]/[slug].tsx";
 import * as $writeups_index from "./routes/writeups/index.tsx";
+import * as $HomeInteractive from "./islands/HomeInteractive.tsx";
 import * as $JointJSComponent from "./islands/JointJSComponent.tsx";
 import * as $NameCycle from "./islands/NameCycle.tsx";
 import * as $WriteupPage from "./islands/WriteupPage.tsx";
@@ -31,6 +32,7 @@ const manifest = {
     "./routes/writeups/index.tsx": $writeups_index,
   },
   islands: {
+    "./islands/HomeInteractive.tsx": $HomeInteractive,
     "./islands/JointJSComponent.tsx": $JointJSComponent,
     "./islands/NameCycle.tsx": $NameCycle,
     "./islands/WriteupPage.tsx": $WriteupPage,

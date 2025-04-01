@@ -1,5 +1,5 @@
 import { type PageProps } from "$fresh/server.ts";
-
+import Footer from "../components/Footer.tsx";
 export default function App({ Component }: PageProps) {
   return (
     <html>
