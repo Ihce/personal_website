@@ -1,7 +1,7 @@
 {
     "imports": {
-      "shiki": "https://deno.land/x/shiki@0.14.5/mod.ts",
-      "marked": "https://deno.land/x/marked@2.1.0/mod.ts"
+      "shiki": "https://esm.sh/shiki@1.0.0",
+      "marked": "https://esm.sh/marked@9.0.3"
     }
   }
   

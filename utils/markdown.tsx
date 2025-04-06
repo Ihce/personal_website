@@ -1,6 +1,7 @@
-// utils/markdown.ts
+// utils/markdown.tsx
 import { walk } from "https://deno.land/std@0.204.0/fs/walk.ts";
 import { parse as parseYAML } from "https://deno.land/std@0.204.0/yaml/mod.ts";
+import { render as gfmRender, CSS as gfmCSS } from "@deno/gfm";
 
 export interface WriteupMetadata {
   title: string;
@@ -20,10 +21,46 @@ export interface Writeup {
   content: string;
 }
 
+// Custom render function to enhance GFM rendering for code blocks
+export function render(markdown: string): string {
+  // Use the GitHub Flavored Markdown renderer
+  let html = gfmRender(markdown);
+  
+  // Ensure code blocks have proper language classes
+  // This regex looks for code blocks that might be missing language classes
+  html = html.replace(
+    /<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g, 
+    (match, attributes, content) => {
+      // Check if code block already has a language class
+      if (attributes.includes('class="language-')) {
+        return match; // Already has language class, leave as is
+      }
+      
+      // Try to determine language from nearby markdown (```language)
+      const markdownPattern = /```([a-zA-Z0-9+#]+)/;
+      const markdownMatch = markdown.match(markdownPattern);
+      
+      if (markdownMatch && markdownMatch[1]) {
+        // Found a language specifier in the markdown
+        return `<pre><code class="language-${markdownMatch[1].toLowerCase()}"${attributes}>${content}</code></pre>`;
+      }
+      
+      // Default to plaintext if no language could be determined
+      return `<pre><code class="language-plaintext"${attributes}>${content}</code></pre>`;
+    }
+  );
+  
+  return html;
+}
+
+// Export the GFM CSS for use in components
+export { gfmCSS as CSS };
+
+// Your existing file processing functions
 export async function getAllWriteups(): Promise<Writeup[]> {
   const writeups: Writeup[] = [];
   const baseDir = "writeups";
-
+  
   // Check if the writeups directory exists
   try {
     const dirInfo = await Deno.stat(baseDir);
@@ -35,7 +72,7 @@ export async function getAllWriteups(): Promise<Writeup[]> {
     console.error("Error accessing writeups directory:", error);
     return [];
   }
-
+  
   // Walk through all directories and files
   for await (const entry of walk(baseDir, { exts: [".md"] })) {
     if (entry.isFile) {
@@ -89,7 +126,7 @@ export async function getAllWriteups(): Promise<Writeup[]> {
   }
   
   // Sort by date, newest first
-  writeups.sort((a, b) => 
+  writeups.sort((a, b) =>
     new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
   );
   

@@ -1,13 +1,13 @@
 ---
 title: "Realistic Backdoor CTF Challenge"
-date: "2025-03-31"
+date: "2025-04-6"
 tags: ["reverse engineering", "malware", "backdoor"]
-description: "I wanted to showcase the build steps & solution to creating and solving a CTF challenge that simulates a backdoor."
+description: "My writeup on my self made CTF challenge"
 ---
 
 # Inspiration for the challenge
 
-For one of my classes at Auburn University we were tasked in creating a CTF jeopardy styled question. Originally, I wanted to explore ideas in obfuscation and control flow manipulations to create a complex and difficult challenge. Eventually, I scrapped that idea and explored the idea of backdooring real software and asking users to find the backdoor to solve the CTF.
+I was tasked to create an original Capture The Flag challenge for the class, COMP:6970 CTF Practicum. Originally, I wanted to explore ideas in obfuscation and control flow manipulations to create a complex and difficult challenge. Eventually, I scrapped that idea and explored the idea of backdooring real software and asking users to find the backdoor to solve the CTF.
 
 > **Try it yourself:** If you would like to try the challenge check out [this repository](#).
 > 
@@ -52,7 +52,7 @@ void recv_msg_userauth_request(void)
 	normal logic...
   }
 
-    dropbear_log(5,"Backdoor triggered");
+  dropbear_log(5,"Backdoor triggered");
   DAT_00146948 = (char *)m_strdup(&DAT_001355fb);
   DAT_00146938 = m_strdup(&DAT_001355f5);
   DAT_00146940 = (char *)m_strdup("/bin/bash");
