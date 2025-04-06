@@ -10,6 +10,7 @@ import * as $api_joke from "./routes/api/joke.ts";
 import * as $greet_name_ from "./routes/greet/[name].tsx";
 import * as $index from "./routes/index.tsx";
 import * as $projects from "./routes/projects.tsx";
+import * as $writeups_path_ from "./routes/writeups/[...path].tsx";
 import * as $writeups_ctf_slug_ from "./routes/writeups/[ctf]/[slug].tsx";
 import * as $writeups_index from "./routes/writeups/index.tsx";
 import * as $HomeInteractive from "./islands/HomeInteractive.tsx";
@@ -28,6 +29,7 @@ const manifest = {
     "./routes/greet/[name].tsx": $greet_name_,
     "./routes/index.tsx": $index,
     "./routes/projects.tsx": $projects,
+    "./routes/writeups/[...path].tsx": $writeups_path_,
     "./routes/writeups/[ctf]/[slug].tsx": $writeups_ctf_slug_,
     "./routes/writeups/index.tsx": $writeups_index,
   },

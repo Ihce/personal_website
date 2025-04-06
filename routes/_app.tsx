@@ -1,5 +1,6 @@
 import { type PageProps } from "$fresh/server.ts";
 import Footer from "../components/Footer.tsx";
+
 export default function App({ Component }: PageProps) {
   return (
     <html>
@@ -11,6 +12,10 @@ export default function App({ Component }: PageProps) {
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/highlight.js/styles/github-dark.min.css"
         />
         <style>{`
           html, body {
